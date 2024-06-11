@@ -17,11 +17,19 @@ interface GerOrdersResponse {
 
 interface GetOrdersQuery {
   pageIndex: number
+  orderId?: string | null
+  customerName?: string | null
+  status?: string | null
 }
 
-export async function getOrders({ pageIndex }: GetOrdersQuery) {
+export async function getOrders({
+  pageIndex,
+  customerName,
+  orderId,
+  status,
+}: GetOrdersQuery) {
   const ordersResponse = await api.get<GerOrdersResponse>('/orders', {
-    params: { pageIndex },
+    params: { pageIndex, customerName, orderId, status },
   })
 
   return ordersResponse.data
