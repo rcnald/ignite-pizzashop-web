@@ -1,7 +1,10 @@
+import { formatDistanceToNow, formatRelative } from 'date-fns'
+import { ptBR } from 'date-fns/locale'
 import { ArrowRight, Search, X } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogTrigger } from '@/components/ui/dialog'
+import { OrderStatus } from '@/components/ui/order-status'
 import { TableCell, TableRow } from '@/components/ui/table'
 import {
   Tooltip,
@@ -12,7 +15,29 @@ import {
 
 import { OrderDetails } from './order-details'
 
-export function OrderTableRow() {
+interface OderTableRowProps {
+  order: {
+    orderId: string
+    createdAt: string
+    status: 'pending' | 'canceled' | 'processing' | 'delivering' | 'delivered'
+    customerName: string
+    total: number
+  }
+}
+
+export function OrderTableRow({ order }: OderTableRowProps) {
+  const totalOrderPrice = order.total.toLocaleString('pt-BR', {
+    style: 'currency',
+    currency: 'BRL',
+  })
+
+  const date = formatRelative(order.createdAt, new Date(), { locale: ptBR })
+
+  const dateDistanceToNow = formatDistanceToNow(order.createdAt, {
+    locale: ptBR,
+    addSuffix: true,
+  })
+
   return (
     <TableRow>
       <TableCell>
@@ -36,17 +61,21 @@ export function OrderTableRow() {
         </Dialog>
       </TableCell>
       <TableCell className="font-mono text-xs font-medium">
-        e8efab04-f580-496a-bf8b-b6281d302d7b
+        {order.orderId}
       </TableCell>
-      <TableCell className="text-muted-foreground">há 15 minutos</TableCell>
+      <TableCell className="text-muted-foreground">
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger>{dateDistanceToNow}</TooltipTrigger>
+            <TooltipContent className="w-fit">{date}</TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      </TableCell>
       <TableCell>
-        <div className="flex items-center gap-2">
-          <span className="size-2 rounded-full bg-slate-400" />
-          <span className="font-medium text-muted-foreground">Pedente</span>
-        </div>
+        <OrderStatus status={order.status} />
       </TableCell>
-      <TableCell className="font-medium">Ronaldo Junior</TableCell>
-      <TableCell className="font-medium">R$ 149,00</TableCell>
+      <TableCell className="font-medium">{order.customerName}</TableCell>
+      <TableCell className="font-medium">{totalOrderPrice}</TableCell>
       <TableCell>
         <Button variant="outline" size="xs">
           <ArrowRight className="mr-2 size-3" />
