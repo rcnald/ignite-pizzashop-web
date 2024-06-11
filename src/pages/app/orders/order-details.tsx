@@ -1,9 +1,15 @@
+import { useQuery } from '@tanstack/react-query'
+import { formatDistanceToNow, formatRelative } from 'date-fns'
+import { ptBR } from 'date-fns/locale'
+
+import { GetOrdersDetails } from '@/api/get-orders-details'
 import {
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import { OrderStatus } from '@/components/ui/order-status'
 import {
   Table,
   TableBody,
@@ -13,82 +19,143 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
+import { formatCentsToPrice } from '@/lib/utils'
 
-export function OrderDetails() {
+interface OrderDetailsProps {
+  orderId: string
+  open: boolean
+}
+
+export function OrderDetails({ orderId, open }: OrderDetailsProps) {
+  const { data: orderDetails } = useQuery({
+    queryKey: ['order-details', orderId],
+    queryFn: () => GetOrdersDetails({ orderId }),
+    enabled: open,
+  })
+
+  const date = formatRelative(
+    orderDetails?.createdAt ?? new Date(),
+    new Date(),
+    {
+      locale: ptBR,
+    },
+  )
+
+  const dateDistanceToNow = formatDistanceToNow(
+    orderDetails?.createdAt ?? new Date(),
+    {
+      locale: ptBR,
+      addSuffix: true,
+    },
+  )
+
   return (
     <DialogContent>
       <DialogHeader>
-        <DialogTitle>Pedido: 2id6513y3274</DialogTitle>
+        <DialogTitle>Pedido: {orderId}</DialogTitle>
         <DialogDescription>Detalhes do pedido</DialogDescription>
       </DialogHeader>
+      {orderDetails ? (
+        <div className="space-y-6">
+          <Table>
+            <TableBody>
+              <TableRow>
+                <TableCell className="text-muted-foreground">Status</TableCell>
+                <TableCell className="flex justify-end">
+                  <OrderStatus status={orderDetails.status} />
+                </TableCell>
+              </TableRow>
 
-      <div className="space-y-6">
-        <Table>
-          <TableBody>
-            <TableRow>
-              <TableCell className="text-muted-foreground">Status</TableCell>
-              <TableCell className="flex justify-end">
-                <div className="flex items-center gap-2">
-                  <span className="size-2 rounded-full bg-slate-400" />
-                  <span className="font-medium text-muted-foreground">
-                    Pendente
-                  </span>
-                </div>
-              </TableCell>
-            </TableRow>
+              <TableRow>
+                <TableCell className="text-muted-foreground">Cliente</TableCell>
+                <TableCell className="flex justify-end">
+                  {orderDetails.customer.name}
+                </TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell className="text-muted-foreground">
+                  Telefone
+                </TableCell>
+                <TableCell className="flex justify-end">
+                  {orderDetails.customer.phone ?? 'Não informado'}
+                </TableCell>
+              </TableRow>
 
-            <TableRow>
-              <TableCell className="text-muted-foreground">Cliente</TableCell>
-              <TableCell className="flex justify-end">Ronaldo Junior</TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell className="text-muted-foreground">Telefone</TableCell>
-              <TableCell className="flex justify-end">
-                (11) 97377-6287
-              </TableCell>
-            </TableRow>
+              <TableRow>
+                <TableCell className="text-muted-foreground">E-mail</TableCell>
+                <TableCell className="flex justify-end">
+                  {orderDetails.customer.email}
+                </TableCell>
+              </TableRow>
 
-            <TableRow>
-              <TableCell className="text-muted-foreground">E-mail</TableCell>
-              <TableCell className="flex justify-end">
-                ronaldomjunior05@gmail.com
-              </TableCell>
-            </TableRow>
+              <TableRow>
+                <TableCell className="text-muted-foreground">
+                  Realizado há
+                </TableCell>
+                <TableCell className="flex justify-end">
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <time
+                          className="cursor-default"
+                          dateTime={orderDetails.createdAt}
+                        >
+                          {dateDistanceToNow}
+                        </time>
+                      </TooltipTrigger>
+                      <TooltipContent className="w-fit">{date}</TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
 
-            <TableRow>
-              <TableCell className="text-muted-foreground">
-                Realizado há
-              </TableCell>
-              <TableCell className="flex justify-end">há 3 minutos</TableCell>
-            </TableRow>
-          </TableBody>
-        </Table>
+          <Table>
+            <TableHeader>
+              <TableHead>Produto</TableHead>
+              <TableHead className="text-right">Qtd.</TableHead>
+              <TableHead className="text-right">Preço</TableHead>
+              <TableHead className="text-right">Subtotal</TableHead>
+            </TableHeader>
+            <TableBody>
+              {orderDetails.orderItems.map((order) => {
+                const orderPrice = formatCentsToPrice(order.priceInCents)
+                const orderTotalPrice = formatCentsToPrice(
+                  order.quantity * order.priceInCents,
+                )
 
-        <Table>
-          <TableHeader>
-            <TableHead>Produto</TableHead>
-            <TableHead className="text-right">Qtd.</TableHead>
-            <TableHead className="text-right">Preço</TableHead>
-            <TableHead className="text-right">Subtotal</TableHead>
-          </TableHeader>
-          <TableBody>
-            <TableRow>
-              <TableCell>Pizza familia</TableCell>
-              <TableHead className="text-right">2</TableHead>
-              <TableHead className="text-right">R$ 69,00</TableHead>
-              <TableHead className="text-right">R$ 138,00</TableHead>
-            </TableRow>
-          </TableBody>
-          <TableFooter>
-            <TableRow>
-              <TableCell colSpan={3}>Total do pedido</TableCell>
-              <TableCell className="text-right font-medium">
-                R$ 138,00
-              </TableCell>
-            </TableRow>
-          </TableFooter>
-        </Table>
-      </div>
+                return (
+                  <TableRow key={order.id}>
+                    <TableCell>{order.product.name}</TableCell>
+                    <TableHead className="text-right">
+                      {order.quantity}
+                    </TableHead>
+                    <TableHead className="text-right">{orderPrice}</TableHead>
+                    <TableHead className="text-right">
+                      {orderTotalPrice}
+                    </TableHead>
+                  </TableRow>
+                )
+              })}
+            </TableBody>
+            <TableFooter>
+              <TableRow>
+                <TableCell colSpan={3}>Total do pedido</TableCell>
+                <TableCell className="text-right font-medium">
+                  {formatCentsToPrice(orderDetails.totalInCents ?? 0)}
+                </TableCell>
+              </TableRow>
+            </TableFooter>
+          </Table>
+        </div>
+      ) : null}
     </DialogContent>
   )
 }

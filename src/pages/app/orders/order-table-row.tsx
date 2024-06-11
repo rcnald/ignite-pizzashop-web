@@ -1,6 +1,7 @@
 import { formatDistanceToNow, formatRelative } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import { ArrowRight, Search, X } from 'lucide-react'
+import { useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogTrigger } from '@/components/ui/dialog'
@@ -12,6 +13,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip'
+import { formatCentsToPrice } from '@/lib/utils'
 
 import { OrderDetails } from './order-details'
 
@@ -26,10 +28,7 @@ interface OderTableRowProps {
 }
 
 export function OrderTableRow({ order }: OderTableRowProps) {
-  const totalOrderPrice = order.total.toLocaleString('pt-BR', {
-    style: 'currency',
-    currency: 'BRL',
-  })
+  const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false)
 
   const date = formatRelative(order.createdAt, new Date(), { locale: ptBR })
 
@@ -41,7 +40,10 @@ export function OrderTableRow({ order }: OderTableRowProps) {
   return (
     <TableRow>
       <TableCell>
-        <Dialog>
+        <Dialog
+          open={isDetailsDialogOpen}
+          onOpenChange={setIsDetailsDialogOpen}
+        >
           <TooltipProvider>
             <Tooltip>
               <DialogTrigger asChild>
@@ -57,7 +59,7 @@ export function OrderTableRow({ order }: OderTableRowProps) {
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
-          <OrderDetails />
+          <OrderDetails orderId={order.orderId} open={isDetailsDialogOpen} />
         </Dialog>
       </TableCell>
       <TableCell className="font-mono text-xs font-medium">
@@ -66,7 +68,9 @@ export function OrderTableRow({ order }: OderTableRowProps) {
       <TableCell className="text-muted-foreground">
         <TooltipProvider>
           <Tooltip>
-            <TooltipTrigger>{dateDistanceToNow}</TooltipTrigger>
+            <TooltipTrigger>
+              <time dateTime={order.createdAt}>{dateDistanceToNow}</time>
+            </TooltipTrigger>
             <TooltipContent className="w-fit">{date}</TooltipContent>
           </Tooltip>
         </TooltipProvider>
@@ -75,7 +79,9 @@ export function OrderTableRow({ order }: OderTableRowProps) {
         <OrderStatus status={order.status} />
       </TableCell>
       <TableCell className="font-medium">{order.customerName}</TableCell>
-      <TableCell className="font-medium">{totalOrderPrice}</TableCell>
+      <TableCell className="font-medium">
+        {formatCentsToPrice(order.total)}
+      </TableCell>
       <TableCell>
         <Button variant="outline" size="xs">
           <ArrowRight className="mr-2 size-3" />
