@@ -1,8 +1,11 @@
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { formatDistanceToNow, formatRelative } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import { ArrowRight, Search, X } from 'lucide-react'
 import { useState } from 'react'
 
+import { cancelOrder } from '@/api/cancel-order'
+import { GetOrdersResponse } from '@/api/get-orders'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogTrigger } from '@/components/ui/dialog'
 import { OrderStatus } from '@/components/ui/order-status'
@@ -29,13 +32,48 @@ interface OderTableRowProps {
 
 export function OrderTableRow({ order }: OderTableRowProps) {
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false)
+  const queryClient = useQueryClient()
 
-  const date = formatRelative(order.createdAt, new Date(), { locale: ptBR })
+  const { mutateAsync: cancelOrderFn } = useMutation({
+    mutationKey: ['cancel-order'],
+    mutationFn: cancelOrder,
+    async onSuccess(_, { orderId }) {
+      const orderListCached = queryClient.getQueriesData<GetOrdersResponse>({
+        queryKey: ['orders'],
+      })
 
-  const dateDistanceToNow = formatDistanceToNow(order.createdAt, {
+      orderListCached.forEach(([cachedKey, cachedData]) => {
+        if (!cachedData) return
+
+        queryClient.setQueryData<GetOrdersResponse>(cachedKey, {
+          ...cachedData,
+          orders: cachedData.orders.map((order) => {
+            if (order.orderId === orderId) {
+              return { ...order, status: 'canceled' }
+            }
+            return order
+          }),
+        })
+      })
+    },
+  })
+
+  const orderDateRelative = formatRelative(order.createdAt, new Date(), {
+    locale: ptBR,
+  })
+
+  const orderDateDistanceToNow = formatDistanceToNow(order.createdAt, {
     locale: ptBR,
     addSuffix: true,
   })
+
+  const orderCannotBeenCanceled = !['pending', 'processing'].includes(
+    order.status,
+  )
+
+  const handleCancelOrder = (orderId: string) => {
+    cancelOrderFn({ orderId })
+  }
 
   return (
     <TableRow>
@@ -69,9 +107,11 @@ export function OrderTableRow({ order }: OderTableRowProps) {
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger>
-              <time dateTime={order.createdAt}>{dateDistanceToNow}</time>
+              <time dateTime={order.createdAt}>{orderDateDistanceToNow}</time>
             </TooltipTrigger>
-            <TooltipContent className="w-fit">{date}</TooltipContent>
+            <TooltipContent className="w-fit">
+              {orderDateRelative}
+            </TooltipContent>
           </Tooltip>
         </TooltipProvider>
       </TableCell>
@@ -89,7 +129,12 @@ export function OrderTableRow({ order }: OderTableRowProps) {
         </Button>
       </TableCell>
       <TableCell>
-        <Button variant="ghost" size="xs">
+        <Button
+          variant="ghost"
+          size="xs"
+          disabled={orderCannotBeenCanceled}
+          onClick={() => handleCancelOrder(order.orderId)}
+        >
           <X className="mr-2 size-3" />
           Cancelar
         </Button>
