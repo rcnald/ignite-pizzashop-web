@@ -1,5 +1,10 @@
+import { useQuery } from '@tanstack/react-query'
+import { subDays } from 'date-fns'
+import { useState } from 'react'
+import { DateRange } from 'react-day-picker'
 import {
   CartesianGrid,
+  Label,
   Line,
   LineChart,
   ResponsiveContainer,
@@ -8,6 +13,7 @@ import {
 } from 'recharts'
 import { violet } from 'tailwindcss/colors'
 
+import { getDailyRevenueInPeriod } from '@/api/get-daily-revenue-in-period'
 import {
   Card,
   CardContent,
@@ -15,17 +21,20 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-
-const data = [
-  { date: '10/12', revenue: 1200 },
-  { date: '11/12', revenue: 100 },
-  { date: '12/12', revenue: 300 },
-  { date: '13/12', revenue: 400 },
-  { date: '14/12', revenue: 1800 },
-  { date: '15/12', revenue: 4200 },
-]
+import { DateRangePicker } from '@/components/ui/data-range-picker'
 
 export function RevenueChart() {
+  const [dateRange, setDateRange] = useState<DateRange | undefined>({
+    from: subDays(new Date(), 7),
+    to: new Date(),
+  })
+
+  const { data: dailyRevenueInPeriod } = useQuery({
+    queryKey: ['metrics', 'daily-revenue-in-period', dateRange],
+    queryFn: () =>
+      getDailyRevenueInPeriod({ from: dateRange?.from, to: dateRange?.to }),
+  })
+
   const formatRevenueLine = (value: number) =>
     value.toLocaleString('pt-BR', {
       style: 'currency',
@@ -41,10 +50,14 @@ export function RevenueChart() {
           </CardTitle>
           <CardDescription>Receita diária no período</CardDescription>
         </div>
+        <div className="flex items-center gap-3">
+          <Label>Período</Label>
+          <DateRangePicker date={dateRange} onDateChange={setDateRange} />
+        </div>
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={240}>
-          <LineChart data={data} style={{ fontSize: 12 }}>
+          <LineChart data={dailyRevenueInPeriod} style={{ fontSize: 12 }}>
             <XAxis dataKey="date" axisLine={false} tickLine={false} dy={16} />
             <YAxis
               stroke="#888"
@@ -57,7 +70,7 @@ export function RevenueChart() {
             <Line
               type="linear"
               strokeWidth={2}
-              dataKey="revenue"
+              dataKey="receipt"
               stroke={violet[500]}
             ></Line>
           </LineChart>
