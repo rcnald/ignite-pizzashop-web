@@ -1,11 +1,13 @@
 import { api } from '@/lib/axios'
 
+import { OrderStatusType } from './get-orders'
+
 export interface GetOrdersDetailsParams {
   orderId: string
 }
 
 export interface GetOrdersDetailsResponse {
-  status: 'pending' | 'canceled' | 'processing' | 'delivering' | 'delivered'
+  status: OrderStatusType
   id: string
   createdAt: string
   totalInCents: number

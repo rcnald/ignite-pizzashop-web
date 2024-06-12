@@ -1,15 +1,11 @@
-type OrderStatus =
-  | 'pending'
-  | 'canceled'
-  | 'processing'
-  | 'delivering'
-  | 'delivered'
+import { OrderStatusType } from '@/api/get-orders'
+import { cn } from '@/lib/utils'
 
-interface OrderStatusProps {
-  status: OrderStatus
+export interface OrderStatusProps {
+  status: OrderStatusType
 }
 
-const orderStatusMap: Record<OrderStatus, string> = {
+const orderStatusTypeMap: Record<OrderStatusType, string> = {
   pending: 'Pendente',
   canceled: 'Cancelado',
   delivered: 'Entregue',
@@ -20,24 +16,16 @@ const orderStatusMap: Record<OrderStatus, string> = {
 export function OrderStatus({ status }: OrderStatusProps) {
   return (
     <div className="flex items-center gap-2">
-      {status === 'pending' && (
-        <span className="h-2 w-2 rounded-full bg-slate-400" />
-      )}
-
-      {status === 'canceled' && (
-        <span className="h-2 w-2 rounded-full bg-rose-500" />
-      )}
-
-      {status === 'delivered' && (
-        <span className="h-2 w-2 rounded-full bg-emerald-500" />
-      )}
-
-      {['processing', 'delivering'].includes(status) && (
-        <span className="h-2 w-2 rounded-full bg-amber-500" />
-      )}
-
+      <span
+        className={cn('h-2 w-2 rounded-full', {
+          'bg-slate-400': status === 'pending',
+          'bg-rose-500': status === 'canceled',
+          'bg-emerald-500': status === 'delivered',
+          'bg-amber-500': status === 'processing' || status === 'delivering',
+        })}
+      />
       <span className="font-medium text-muted-foreground">
-        {orderStatusMap[status]}
+        {orderStatusTypeMap[status]}
       </span>
     </div>
   )
