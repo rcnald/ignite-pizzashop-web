@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { DollarSign } from 'lucide-react'
 
 import { getMonthRevenue } from '@/api/get-month-revenue'
+import { MetricCardSkeleton } from '@/components/skeletons/metric-card-skeleton'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { cn, formatCentsToPrice } from '@/lib/utils'
 
@@ -22,21 +23,27 @@ export function MonthRevenueCard() {
         <DollarSign className="size-4 text-muted-foreground" />
       </CardHeader>
       <CardContent className="space-y-1">
-        <span className="text-2xl font-bold tracking-tight">
-          {formatCentsToPrice(monthRevenue?.receipt ?? 0)}
-        </span>
-        <p className="text-xs text-muted-foreground">
-          <span
-            className={cn('text-rose-500 dark:text-rose-400', {
-              'text-emerald-500 dark:text-emerald-400':
-                isDiffFromLastMonthPositive,
-            })}
-          >
-            {isDiffFromLastMonthPositive ? '+' : null}
-            {monthRevenue?.diffFromLastMonth}%{' '}
-          </span>
-          em relação ao mês passado
-        </p>
+        {monthRevenue ? (
+          <>
+            <span className="text-2xl font-bold tracking-tight">
+              {formatCentsToPrice(monthRevenue?.receipt ?? 0)}
+            </span>
+            <p className="text-xs text-muted-foreground">
+              <span
+                className={cn('text-rose-500 dark:text-rose-400', {
+                  'text-emerald-500 dark:text-emerald-400':
+                    isDiffFromLastMonthPositive,
+                })}
+              >
+                {isDiffFromLastMonthPositive ? '+' : null}
+                {monthRevenue?.diffFromLastMonth}%{' '}
+              </span>
+              em relação ao mês passado
+            </p>
+          </>
+        ) : (
+          <MetricCardSkeleton />
+        )}
       </CardContent>
     </Card>
   )

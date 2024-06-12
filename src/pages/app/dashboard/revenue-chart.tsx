@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { subDays } from 'date-fns'
+import { Loader2 } from 'lucide-react'
 import { useState } from 'react'
 import { DateRange } from 'react-day-picker'
 import {
@@ -56,25 +57,31 @@ export function RevenueChart() {
         </div>
       </CardHeader>
       <CardContent>
-        <ResponsiveContainer width="100%" height={240}>
-          <LineChart data={dailyRevenueInPeriod} style={{ fontSize: 12 }}>
-            <XAxis dataKey="date" axisLine={false} tickLine={false} dy={16} />
-            <YAxis
-              stroke="#888"
-              axisLine={false}
-              tickLine={false}
-              width={88}
-              tickFormatter={formatRevenueLine}
-            />
-            <CartesianGrid vertical={false} className="stroke-muted" />
-            <Line
-              type="linear"
-              strokeWidth={2}
-              dataKey="receipt"
-              stroke={violet[500]}
-            ></Line>
-          </LineChart>
-        </ResponsiveContainer>
+        {dailyRevenueInPeriod ? (
+          <ResponsiveContainer width="100%" height={240}>
+            <LineChart data={dailyRevenueInPeriod} style={{ fontSize: 12 }}>
+              <XAxis dataKey="date" axisLine={false} tickLine={false} dy={16} />
+              <YAxis
+                stroke="#888"
+                axisLine={false}
+                tickLine={false}
+                width={88}
+                tickFormatter={formatRevenueLine}
+              />
+              <CartesianGrid vertical={false} className="stroke-muted" />
+              <Line
+                type="linear"
+                strokeWidth={2}
+                dataKey="receipt"
+                stroke={violet[500]}
+              ></Line>
+            </LineChart>
+          </ResponsiveContainer>
+        ) : (
+          <div className="flex h-[240px] w-full items-center justify-center">
+            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+          </div>
+        )}
       </CardContent>
     </Card>
   )

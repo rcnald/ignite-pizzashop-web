@@ -16,6 +16,7 @@ export function Dashboard() {
 
         <div className="grid grid-cols-4 gap-4">
           <MonthRevenueCard />
+
           <MonthOrdersAmountCard />
           <DaysOrdersAmountCard />
           <MonthCanceledOrdersAmountCard />
