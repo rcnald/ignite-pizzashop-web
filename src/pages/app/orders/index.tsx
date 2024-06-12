@@ -4,6 +4,7 @@ import { useSearchParams } from 'react-router-dom'
 import { z } from 'zod'
 
 import { getOrders } from '@/api/get-orders'
+import { OrderTableSkeleton } from '@/components/skeletons/order-table-skeleton'
 import { Pagination } from '@/components/ui/pagination'
 import {
   Table,
@@ -28,7 +29,7 @@ export function Orders() {
     .transform((page) => page - 1)
     .parse(searchParams.get('page') ?? 1)
 
-  const { data: result } = useQuery({
+  const { data: result, isLoading: isOrdersLoading } = useQuery({
     queryKey: ['orders', pageIndex, orderId, customerName, status],
     queryFn: () =>
       getOrders({
@@ -74,6 +75,8 @@ export function Orders() {
                   result.orders.map((order) => (
                     <OrderTableRow key={order.orderId} order={order} />
                   ))}
+
+                {isOrdersLoading && <OrderTableSkeleton />}
               </TableBody>
             </Table>
           </div>

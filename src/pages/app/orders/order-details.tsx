@@ -3,6 +3,7 @@ import { formatDistanceToNow, formatRelative } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 
 import { getOrdersDetails } from '@/api/get-orders-details'
+import { OrderDetailsSkeleton } from '@/components/skeletons/order-details-skeleton'
 import {
   DialogContent,
   DialogDescription,
@@ -155,7 +156,9 @@ export function OrderDetails({ orderId, open }: OrderDetailsProps) {
             </TableFooter>
           </Table>
         </div>
-      ) : null}
+      ) : (
+        <OrderDetailsSkeleton />
+      )}
     </DialogContent>
   )
 }
