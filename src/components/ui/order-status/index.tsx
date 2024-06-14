@@ -1,31 +1,30 @@
-import { OrderStatusType } from '@/api/get-orders'
-import { cn } from '@/lib/utils'
+import { OrderStatusType } from '@/api/get-orders';
+import { cn } from '@/lib/utils';
 
 export interface OrderStatusProps {
   status: OrderStatusType
 }
 
-const orderStatusTypeMap: Record<OrderStatusType, string> = {
-  pending: 'Pendente',
-  canceled: 'Cancelado',
-  delivered: 'Entregue',
-  delivering: 'Em entrega',
-  processing: 'Em preparo',
+export const orderStatusTypeMap: Record<
+  OrderStatusType,
+  { content: string; color: string }
+> = {
+  pending: { content: 'Pendente', color: 'bg-slate-400' },
+  canceled: { content: 'Cancelado', color: 'bg-rose-500' },
+  delivered: { content: 'Entregue', color: 'bg-emerald-500' },
+  delivering: { content: 'Em entrega', color: 'bg-amber-500' },
+  processing: { content: 'Em preparo', color: 'bg-amber-500' },
 }
 
 export function OrderStatus({ status }: OrderStatusProps) {
   return (
     <div className="flex items-center gap-2">
       <span
-        className={cn('h-2 w-2 rounded-full', {
-          'bg-slate-400': status === 'pending',
-          'bg-rose-500': status === 'canceled',
-          'bg-emerald-500': status === 'delivered',
-          'bg-amber-500': status === 'processing' || status === 'delivering',
-        })}
+        data-testid="badge"
+        className={cn('h-2 w-2 rounded-full', orderStatusTypeMap[status].color)}
       />
       <span className="font-medium text-muted-foreground">
-        {orderStatusTypeMap[status]}
+        {orderStatusTypeMap[status].content}
       </span>
     </div>
   )
