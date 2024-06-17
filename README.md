@@ -1,30 +1,68 @@
-# React + TypeScript + Vite
+# Ignite - pizzashop
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Pizzashop é um projeto que nasceu com um proposito bem simples, mostrar o poder do tanstack query, e como sua manipulação de cache pode mudar completamente a experiencia do usuário na sua aplicação. 
 
-Currently, two official plugins are available:
+Um dashboard destinado a lojistas, que querem gerir melhor seu negocio, com métricas de seus pedidos, filtragem do pedidos, e claro melhor controle sobre os pedidos.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Funcionalidades
 
-## Expanding the ESLint configuration
+- **Cadastro de Lojas:** Crie o cadastro da sua loja no dashboard.
+- **Login:** Acesse o dashboard, apenas com seu email cadastrado.
+- **Edição:** Modifique nome e descrição de sua loja.
+- **Pesquisa:** Pesquisar pedidos por nome do cliente, ID e status.
+- **Visualização detalhada:** Ao clicar no botão de detalhes em qualquer pedido, será exibido detalhes sobre sua composição, como items do pedido, email do cliente etc.
+- **Edição:** Modifique nome e descrição de sua loja.
+- **Modificar status do pedido:** Atualize o status do pedido, conforme sua produção.
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
-
-- Configure the top-level `parserOptions` property like this:
-
-```js
-export default {
-  // other rules...
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-  },
-}
+## Conta demonstração
+Este projeto esta integrado a API feita em aulas da Rocketseat, para roda-lo localmente clone este repositório
+[pizzashop-api](https://github.com/rocketseat-education/pizzashop-api)
+```http
+e-mail: diego.schell.f@gmail.com
 ```
 
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+## Pré-requisitos
+
+Antes de começar, certifique-se de ter o [Node.js](https://nodejs.org/) instalado em seu sistema.
+
+## Como Usar
+
+1. **Clone este repositório:**
+   ```bash
+   git clone https://github.com/rcnald/ignite-pizzashop-web.git
+   # or
+   gh repo clone rcnald/ignite-pizzashop-web
+   ```
+2. **Entrar no diretório**
+    ```bash
+    cd ignite-pizzashop-web
+    ```
+  
+3. **Instalar suas dependências**
+   
+    ```
+    npm install
+    ```
+4. **Crie e configure o arquivo de configuração**
+
+    Crie um arquivo `.env.local` na raiz do projeto, com base no `.env.example`
+
+    ```ts
+    VITE_API_URL=api_url
+    VITE_ENABLE_API_DELAY="false"
+    ```
+5. **Iniciar o projeto**
+    ```
+    npm run dev
+    ```
+    Logo após isso o projeto será iniciado na porta [http://localhost:5173](http://localhost:5173) se disponível.
+
+## Principais tecnologias usadas
+Tecnologias e bibliotecas utilizadas para a construção do projeto. 
+- [react](https://react.dev/)
+- [typescript](https://www.typescriptlang.org/)
+- [axios](https://axios-http.com/docs/intro)
+- [zod](https://zod.dev/)
+- [react-hook-form](https://react-hook-form.com/)
+- [tanstackquery](https://tanstack.com/query/latest/docs/framework/react/overview)
+- [vite](https://vitejs.dev/guide/env-and-mode)
