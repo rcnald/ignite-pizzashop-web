@@ -1,6 +1,6 @@
 # Ignite - pizzashop
 
-Pizzashop é um projeto que nasceu com um proposito bem simples, mostrar o poder do tanstack query, e como sua manipulação de cache pode mudar completamente a experiencia do usuário na sua aplicação. 
+Pizzashop é um projeto que nasceu com um proposito bem simples, mostrar o poder do tanstack query, e como sua manipulação de cache pode mudar completamente a experiencia do usuário na sua aplicação, Sem deixar de lado sua UI, que foi construída por meio de components acessíveis do shadcn/ui 
 
 Um dashboard destinado a lojistas, que querem gerir melhor seu negocio, com métricas de seus pedidos, filtragem do pedidos, e claro melhor controle sobre os pedidos.
 
@@ -59,6 +59,7 @@ Antes de começar, certifique-se de ter o [Node.js](https://nodejs.org/) instala
 
 ## Principais tecnologias usadas
 Tecnologias e bibliotecas utilizadas para a construção do projeto. 
+- [shadcn/ui](https://ui.shadcn.com/)
 - [react](https://react.dev/)
 - [typescript](https://www.typescriptlang.org/)
 - [axios](https://axios-http.com/docs/intro)
